@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AR Rasengan</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/GLTFLoader.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three/examples/js/WebXR/ARButton.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; }
+    </style>
+</head>
+<body>
+    <script>
+        let scene, camera, renderer, rasengan;
+
+        function init() {
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            renderer = new THREE.WebGLRenderer({ alpha: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            document.body.appendChild(ARButton.createButton(renderer));
+            renderer.xr.enabled = true;
+
+            let light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
+            scene.add(light);
+
+            let loader = new THREE.GLTFLoader();
+            loader.load('rasengan.glb', function (gltf) {
+                rasengan = gltf.scene;
+                rasengan.scale.set(0.3, 0.3, 0.3);
+                rasengan.position.set(0, 0, -1); // Đưa Rasengan ra trước camera
+                scene.add(rasengan);
+            });
+
+            camera.position.set(0, 1.5, 3);
+            animate();
+        }
+
+        function animate() {
+            renderer.setAnimationLoop(() => {
+                if (rasengan) rasengan.rotation.y += 0.1; // Xoay Rasengan
+                renderer.render(scene, camera);
+            });
+        }
+
+        init();
+    </script>
+</body>
+</html>
