@@ -6,7 +6,10 @@
     <title>AR Rasengan</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three/examples/js/WebXR/ARButton.js"></script>
+    <script type="module">
+        import { ARButton } from 'https://cdn.jsdelivr.net/npm/three@0.138.0/examples/jsm/webxr/ARButton.js';
+        window.createARButton = (renderer) => ARButton.createButton(renderer);
+    </script>
     <style>
         body { margin: 0; overflow: hidden; }
     </style>
@@ -22,7 +25,9 @@
             renderer.setSize(window.innerWidth, window.innerHeight);
             document.body.appendChild(renderer.domElement);
 
-            document.body.appendChild(ARButton.createButton(renderer));
+            if (window.createARButton) {
+                document.body.appendChild(window.createARButton(renderer));
+            }
             renderer.xr.enabled = true;
 
             let light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
