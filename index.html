@@ -8,27 +8,30 @@
     <script src="https://cdn.jsdelivr.net/npm/three/examples/js/loaders/GLTFLoader.js"></script>
     <script type="module">
         import { ARButton } from 'https://cdn.jsdelivr.net/npm/three@0.138.0/examples/jsm/webxr/ARButton.js';
-        window.createARButton = (renderer) => ARButton.createButton(renderer);
-    </script>
-    <style>
-        body { margin: 0; overflow: hidden; }
-    </style>
-</head>
-<body>
-    <script>
+
         let scene, camera, renderer, rasengan;
 
         function init() {
             scene = new THREE.Scene();
             camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+
             renderer = new THREE.WebGLRenderer({ alpha: true });
             renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.xr.enabled = true;
             document.body.appendChild(renderer.domElement);
 
-            if (window.createARButton) {
-                document.body.appendChild(window.createARButton(renderer));
+            // Kiểm tra nếu trình duyệt hỗ trợ WebXR thì thêm nút AR
+            if (navigator.xr) {
+                navigator.xr.isSessionSupported('immersive-ar').then((supported) => {
+                    if (supported) {
+                        document.body.appendChild(ARButton.createButton(renderer, { requiredFeatures: ['hit-test'] }));
+                    } else {
+                        alert("Trình duyệt không hỗ trợ WebXR AR.");
+                    }
+                });
+            } else {
+                alert("Thiết bị của bạn không hỗ trợ WebXR.");
             }
-            renderer.xr.enabled = true;
 
             let light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
             scene.add(light);
@@ -37,7 +40,7 @@
             loader.load('rasengan.glb', function (gltf) {
                 rasengan = gltf.scene;
                 rasengan.scale.set(0.3, 0.3, 0.3);
-                rasengan.position.set(0, 0, -1); // Đưa Rasengan ra trước camera
+                rasengan.position.set(0, 0, -1);
                 scene.add(rasengan);
             });
 
@@ -47,12 +50,13 @@
 
         function animate() {
             renderer.setAnimationLoop(() => {
-                if (rasengan) rasengan.rotation.y += 0.1; // Xoay Rasengan
+                if (rasengan) rasengan.rotation.y += 0.1;
                 renderer.render(scene, camera);
             });
         }
 
         init();
     </script>
-</body>
+</head>
+<body></body>
 </html>
